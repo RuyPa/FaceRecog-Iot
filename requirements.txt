@@ -1,0 +1,4 @@
+opencv-python
+numpy
+face-recognition # nên cùng python 3.8.10 dể install face-recognition
+datetime
