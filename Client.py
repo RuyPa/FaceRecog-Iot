@@ -6,7 +6,7 @@ import struct
 class FaceRecognitionClient:
     def __init__(self):
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect(('192.168.71.185', 806))  # Connect to the server
+        self.client_socket.connect(('localhost', 806))  # Connect to the server
 
     def send_data(self, data):
         encoded_data = pickle.dumps(data)

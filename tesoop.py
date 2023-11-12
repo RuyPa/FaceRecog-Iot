@@ -71,33 +71,33 @@ class FaceRecognition:
         return img
 
 
-# def main():
-#     path = 'ImagesAttendance'  # Đường dẫn đến thư mục chứa ảnh
-#     recognition = FaceRecognition(path)
-#     recognition.load_images()  # Tải ảnh và mã hóa khuôn mặt
-#
-#     cap = cv2.VideoCapture(0)
-#     cap.set(3, 640)
-#     cap.set(4, 480)
-#
-#     if not cap.isOpened():
-#         sys.exit('Video source not found...')
-#
-#     while True:
-#         success, img = cap.read()
-#
-#         if not success:
-#             continue
-#
-#         img = recognition.recognize_faces(img)  # Nhận diện và chấm công
-#
-#         cv2.imshow('Webcam', img)
-#         if cv2.waitKey(1) & 0xFF == ord('q'):
-#             break
-#
-#     cap.release()
-#     cv2.destroyAllWindows()
-#
-#
-# if __name__ == "__main__":
-#     main()
+def main():
+    path = 'ImagesAttendance'  # Đường dẫn đến thư mục chứa ảnh
+    recognition = FaceRecognition(path)
+    recognition.load_images()  # Tải ảnh và mã hóa khuôn mặt
+
+    cap = cv2.VideoCapture(0)
+    cap.set(3, 640)
+    cap.set(4, 480)
+
+    if not cap.isOpened():
+        sys.exit('Video source not found...')
+
+    while True:
+        success, img = cap.read()
+
+        if not success:
+            continue
+
+        img = recognition.recognize_faces(img)  # Nhận diện và chấm công
+
+        cv2.imshow('Webcam', img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()
