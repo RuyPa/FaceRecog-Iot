@@ -1,31 +1,94 @@
+# # import cv2
+# # import pickle
+# # import socket
+# # import struct
+# #
+# # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# # host_ip = 'localhost'  # Địa chỉ IP của server
+# # port = 9999
+# # client_socket.connect((host_ip, port))
+# #
+# # vid = cv2.VideoCapture(0)  # Mở webcam
+# #
+# # try:
+# #     while True:
+# #         ret, frame = vid.read()
+# #         a = pickle.dumps(frame)
+# #         message = struct.pack("Q", len(a)) + a
+# #         client_socket.sendall(message)
+# #
+# #         cv2.imshow('TRANSMITTING VIDEO', frame)
+# #         key = cv2.waitKey(1) & 0xFF
+# #         if key == ord('q'):
+# #             break
+# #
+# # except KeyboardInterrupt:
+# #     pass
+# #
+# # client_socket.close()
+# # cv2.destroyAllWindows()
+# #
+# #
+#
+# import cv2
+# import pickle
+# import socket
+# import struct
+#
+# client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# host_ip = 'localhost'  # Địa chỉ IP của server
+# port = 9999
+#
+# try:
+#     client_socket.connect((host_ip, port))
+#     vid = cv2.VideoCapture(0)  # Mở webcam
+#
+#     while True:
+#         ret, frame = vid.read()
+#         a = pickle.dumps(frame)
+#         message = struct.pack("Q", len(a)) + a
+#         client_socket.sendall(message)
+#
+#         cv2.imshow('TRANSMITTING VIDEO', frame)
+#         key = cv2.waitKey(1) & 0xFF
+#         if key == ord('q'):
+#             break
+#
+# except KeyboardInterrupt:
+#     pass
+#
+# client_socket.close()
+# cv2.destroyAllWindows()
+#
+
+
 import cv2
 import pickle
 import socket
 import struct
 
-# create socket
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host_ip = 'localhost'  # paste your server ip address here
+host_ip = 'localhost'  # Địa chỉ IP của server
 port = 9999
-client_socket.connect((host_ip, port))  # a tuple
-data = b""
-payload_size = struct.calcsize("Q")
-while True:
-    while len(data) < payload_size:
-        packet = client_socket.recv(4 * 1024)  # 4K
-        if not packet: break
-        data += packet
-    packed_msg_size = data[:payload_size]
-    data = data[payload_size:]
-    msg_size = struct.unpack("Q", packed_msg_size)[0]
 
-    while len(data) < msg_size:
-        data += client_socket.recv(4 * 1024)
-    frame_data = data[:msg_size]
-    data = data[msg_size:]
-    frame = pickle.loads(frame_data)
-    cv2.imshow("RECEIVING VIDEO", frame)
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord('q'):
-        break
-client_socket.close()
+try:
+    client_socket.connect((host_ip, port))
+    vid = cv2.VideoCapture(0)  # Mở webcam
+
+    while True:
+        ret, frame = vid.read()
+        a = pickle.dumps(frame)
+        message = struct.pack("Q", len(a)) + a
+        client_socket.sendall(message)
+
+        cv2.imshow('TRANSMITTING VIDEO', frame)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            break
+
+except KeyboardInterrupt:
+    pass
+
+finally:
+    client_socket.close()
+    cv2.destroyAllWindows()
