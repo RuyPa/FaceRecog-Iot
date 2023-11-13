@@ -1,34 +1,39 @@
-import socket
 import cv2
-import base64
-import numpy as np
+import imutils
+import pickle
+import socket
+import struct
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_ip = '127.0.0.1'  # IP của server
-server_port = 12345
-server_socket.bind((server_ip, server_port))
+# Socket Create
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host_name = socket.gethostname()
+host_ip = 'localhost'
+print('HOST IP:', host_ip)
+port = 9999
+socket_address = (host_ip, port)
 
-data = b''  # Dữ liệu từ client
+# Socket Bind
+server_socket.bind(socket_address)
 
+# Socket Listen
+server_socket.listen(5)
+print("LISTENING AT:", socket_address)
+
+# Socket Accept
 while True:
-    chunk, addr = server_socket.recvfrom(65507)
-    data += chunk
+    client_socket, addr = server_socket.accept()
+    print('GOT CONNECTION FROM:', addr)
+    if client_socket:
+        vid = cv2.VideoCapture(0)
 
-    try:
-        frame = base64.b64decode(data)
-        nparr = np.frombuffer(frame, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        while (vid.isOpened()):
+            img, frame = vid.read()
+            frame = imutils.resize(frame, width=320)
+            a = pickle.dumps(frame)
+            message = struct.pack("Q", len(a)) + a
+            client_socket.sendall(message)
 
-        # Kiểm tra nếu hình ảnh có kích thước hợp lệ trước khi hiển thị
-        if image is not None and image.shape[0] > 0 and image.shape[1] > 0:
-            cv2.imshow('Received Image from Client', image)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-        data = b''  # Reset dữ liệu sau khi xử lý
-    except base64.binascii.Error:
-        pass
-
-cv2.destroyAllWindows()
-
-
+            cv2.imshow('TRANSMITTING VIDEO', frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord('q'):
+                client_socket.close()

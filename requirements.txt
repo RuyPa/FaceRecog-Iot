@@ -1,4 +1,5 @@
-opencv-python
-numpy
+opencv-python~=4.8.0.76
+numpy~=1.24.4
 face-recognition # nên cùng python 3.8.10 dể install face-recognition
-datetime
+datetime~=5.2
+firebase~=4.0.1
