@@ -46,7 +46,7 @@ class FaceRecognitionServer:
 
 
     def start_server(self):
-        self.server_socket.listen(5)
+        self.server_socket.listen(2)
         while True:
             client_socket, addr = self.server_socket.accept()
             self.client_connected = True
@@ -170,14 +170,15 @@ class FaceRecognitionServer:
                     self.stime = etime
             else:
                 name = 'Unknown'
+                print(name)
 
             recognized_names.append(name)
 
-            y1, x2, y2, x1 = faceLoc
-            y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
-            cv2.rectangle(processed_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            cv2.rectangle(processed_img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
-            cv2.putText(processed_img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
+            # y1, x2, y2, x1 = faceLoc
+            # y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
+            # cv2.rectangle(processed_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            # cv2.rectangle(processed_img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
+            # cv2.putText(processed_img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
 
         return processed_img, recognized_names
 
