@@ -4,6 +4,7 @@ import numpy as np
 import face_recognition
 import os
 from datetime import datetime
+from service import AddAttendanceTime
 
 path = '..\ImagesAttendance'
 images = []
@@ -43,15 +44,8 @@ def markAttendance(name, time):
 encodeListKnown = findEncodings(images)
 print('Encoding Complete')
 
-# cap = cv2.VideoCapture(0)
-# cap.set(3, 640)
-# cap.set(4, 480)
-#
-# if not cap.isOpened():
-#     sys.exit('Video source not found...')
 
-
-def process(img):
+def process(img,doneornot):
     global stime
     # while True:
     imgS = cv2.resize(img, (0, 0), None, fx=0.25, fy=0.25)
@@ -75,13 +69,18 @@ def process(img):
                 stime = etime
         else:
             name = 'Unknown'
+
+
+        if doneornot == False and name != 'Unknown':
+            AddAttendanceTime.addAttendanceTime(name)
+            doneornot = True
+
         print(name)
         y1, x2, y2, x1 = faceLoc
         y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
         cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
         cv2.rectangle(img, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
         cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-    # if cv2.waitKey(1) == ord('q'):
-    #     break
+
     cv2.imshow('Webcam', img)
     cv2.waitKey(1)

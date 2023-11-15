@@ -4,6 +4,10 @@ import cv2
 import pickle
 import socket
 import struct
+
+import firebase_admin
+from firebase_admin import credentials
+
 from udp import TestCore
 
 show_receiving = True
@@ -15,6 +19,8 @@ def receive_from_client(client_socket):
 
     frame_queue = queue.Queue()
     max_queue = 0
+
+    doneornot = False
 
     while show_receiving:
         try:
@@ -41,7 +47,7 @@ def receive_from_client(client_socket):
             data = data[msg_size:]
             frame = pickle.loads(frame_data)
 
-            TestCore.process(frame)
+            TestCore.process(frame, doneornot)
 
         except struct.error as e:
             print(f"Error: {e}")
@@ -54,7 +60,7 @@ def server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # host_ip = socket.gethostbyname(socket.gethostname())
 
-    host_ip = '192.168.113.143'
+    host_ip = '192.168.137.1'
 
     print('HOST IP:', host_ip)
     port = 806
@@ -63,6 +69,11 @@ def server():
     server_socket.bind(socket_address)
     server_socket.listen(5)
     print("LISTENING AT:", socket_address)
+
+    cred = credentials.Certificate("..\serviceAccountKey.json")
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': "https://ruypa-64600-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    })
 
     while True:
         client_socket, addr = server_socket.accept()

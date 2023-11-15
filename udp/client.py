@@ -4,7 +4,7 @@ import socket
 import struct
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host_ip = '192.168.113.143'  # Địa chỉ IP của server
+host_ip = '192.168.137.1'  # Địa chỉ IP của server
 port = 806
 
 try:
