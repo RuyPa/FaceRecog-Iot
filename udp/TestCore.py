@@ -45,7 +45,7 @@ encodeListKnown = findEncodings(images)
 print('Encoding Complete')
 
 
-def process(img,doneornot):
+def process(img):
     global stime
     # while True:
     imgS = cv2.resize(img, (0, 0), None, fx=0.25, fy=0.25)
@@ -55,6 +55,8 @@ def process(img,doneornot):
     encodesCurFrame = face_recognition.face_encodings(imgS, facesCurFrame)
 
     etime = datetime.now().strftime('%S')
+
+    name = ''
 
     for encodeFace, faceLoc in zip(encodesCurFrame, facesCurFrame):
         matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
@@ -71,9 +73,8 @@ def process(img,doneornot):
             name = 'Unknown'
 
 
-        if doneornot == False and name != 'Unknown':
+        if name != 'Unknown':
             AddAttendanceTime.addAttendanceTime(name)
-            doneornot = True
 
         print(name)
         y1, x2, y2, x1 = faceLoc
@@ -84,3 +85,6 @@ def process(img,doneornot):
 
     cv2.imshow('Webcam', img)
     cv2.waitKey(1)
+
+    return name
+

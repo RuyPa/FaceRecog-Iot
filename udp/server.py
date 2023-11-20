@@ -20,7 +20,6 @@ def receive_from_client(client_socket):
     frame_queue = queue.Queue()
     max_queue = 0
 
-    doneornot = False
 
     while show_receiving:
         try:
@@ -47,7 +46,16 @@ def receive_from_client(client_socket):
             data = data[msg_size:]
             frame = pickle.loads(frame_data)
 
-            TestCore.process(frame, doneornot)
+            name = TestCore.process(frame)
+
+            if name != 'Unknown':
+                name_message = pickle.dumps('1')
+                name_length = struct.pack("Q", len(name_message))
+                client_socket.sendall(name_length + name_message)
+            else:
+                name_message = pickle.dumps('0')
+                name_length = struct.pack("Q", len(name_message))
+                client_socket.sendall(name_length + name_message)
 
         except struct.error as e:
             print(f"Error: {e}")
@@ -60,7 +68,7 @@ def server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # host_ip = socket.gethostbyname(socket.gethostname())
 
-    host_ip = '192.168.137.1'
+    host_ip = '192.168.71.185'
 
     print('HOST IP:', host_ip)
     port = 806
