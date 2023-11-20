@@ -34,6 +34,6 @@ def removeAttendanceTimeByKey(id, key_to_remove):
         ref.child(id).update({"attendance time": data_of_id["attendance time"]})
 
 # Gọi hàm để xóa một attendance time cụ thể, ví dụ key = 0
-if __name__ == '__main__':
-    for i in range(5, 67):
-        removeAttendanceTimeByKey('BA DUY', i)
+# if __name__ == '__main__':
+#     for i in range(5, 67):
+#         removeAttendanceTimeByKey('BA DUY', i)

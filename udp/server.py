@@ -1,3 +1,4 @@
+import os
 import queue
 
 import cv2
@@ -6,10 +7,16 @@ import socket
 import struct
 
 import firebase_admin
-from firebase_admin import credentials
+import numpy as np
+from firebase_admin import credentials, storage
 
-from udp import TestCore
+print('duyyy')
 
+# from udp import TestCore
+
+from udp.TestCore import face_recog
+tmp=face_recog()
+print('nhat')
 show_receiving = True
 
 def receive_from_client(client_socket):
@@ -46,13 +53,15 @@ def receive_from_client(client_socket):
             data = data[msg_size:]
             frame = pickle.loads(frame_data)
 
-            name = TestCore.process(frame)
+            # name = TestCore.process(frame)
 
-            if name != 'Unknown':
+            name = tmp.process(frame)
+
+            if name != 'Unknown' or name == '':
                 name_message = pickle.dumps('1')
                 name_length = struct.pack("Q", len(name_message))
                 client_socket.sendall(name_length + name_message)
-            else:
+            if name == 'Unknown':
                 name_message = pickle.dumps('0')
                 name_length = struct.pack("Q", len(name_message))
                 client_socket.sendall(name_length + name_message)
@@ -71,7 +80,7 @@ def server():
     host_ip = '192.168.71.185'
 
     print('HOST IP:', host_ip)
-    port = 806
+    port = 807
     socket_address = (host_ip, port)
 
     server_socket.bind(socket_address)
@@ -79,10 +88,12 @@ def server():
     print("LISTENING AT:", socket_address)
 
     cred = credentials.Certificate("..\serviceAccountKey.json")
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': "https://ruypa-64600-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    app = firebase_admin.initialize_app(cred, {
+        'databaseURL': "https://ruypa-64600-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        'storageBucket': "ruypa-64600.appspot.com"
     })
-
+    tmp.setMany(app)
+    print('124')
     while True:
         client_socket, addr = server_socket.accept()
         print('GOT CONNECTION FROM:', addr)
