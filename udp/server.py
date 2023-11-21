@@ -9,6 +9,7 @@ import struct
 import firebase_admin
 import numpy as np
 from firebase_admin import credentials, storage
+from FAS import anti_spoof
 
 print('duyyy')
 
@@ -53,16 +54,36 @@ def receive_from_client(client_socket):
             data = data[msg_size:]
             frame = pickle.loads(frame_data)
 
+
+
+            frame1 = np.array(frame)
+
+            frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGRA2BGR)
+
+
+            frame2 = frame
             # name = TestCore.process(frame)
 
-            name = tmp.process(frame)
+            resultFromDetect = anti_spoof(frame1)
 
-            if name != 'Unknown' or name == '':
-                name_message = pickle.dumps('1')
-                name_length = struct.pack("Q", len(name_message))
-                client_socket.sendall(name_length + name_message)
-            if name == 'Unknown':
-                name_message = pickle.dumps('0')
+            # resultFromDetect = True
+
+
+
+            if resultFromDetect == True:
+
+                name = tmp.process(frame2)
+
+                if name != 'Unknown' or name == '':
+                    name_message = pickle.dumps('1')
+                    name_length = struct.pack("Q", len(name_message))
+                    client_socket.sendall(name_length + name_message)
+                if name == 'Unknown':
+                    name_message = pickle.dumps('0')
+                    name_length = struct.pack("Q", len(name_message))
+                    client_socket.sendall(name_length + name_message)
+            else:
+                name_message = pickle.dumps('Fake')
                 name_length = struct.pack("Q", len(name_message))
                 client_socket.sendall(name_length + name_message)
 
@@ -77,7 +98,7 @@ def server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # host_ip = socket.gethostbyname(socket.gethostname())
 
-    host_ip = '192.168.71.185'
+    host_ip = '192.168.117.143'
 
     print('HOST IP:', host_ip)
     port = 807

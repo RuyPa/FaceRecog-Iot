@@ -1,0 +1,1 @@
+from FAS.test import anti_spoof
