@@ -11,16 +11,17 @@ import numpy as np
 from firebase_admin import credentials, storage
 from FAS import anti_spoof
 
-print('duyyy')
 
 # from udp import TestCore
 
 from udp.TestCore import face_recog
 tmp=face_recog()
-print('nhat')
+
 show_receiving = True
 
-def receive_from_client(client_socket):
+global currentNumberOfBlobs
+
+def receive_from_client(client_socket, currentNumberOfBlobs, app, tmp):
     global show_receiving
     data = b""
     payload_size = struct.calcsize("Q")
@@ -36,6 +37,15 @@ def receive_from_client(client_socket):
                 if not packet:
                     break
                 data += packet
+
+                numberOfBlos = checkNumberOfBlob(app)
+
+                # print(numberOfBlos)
+                # print(currentNumberOfBlobs)
+
+                if (numberOfBlos != currentNumberOfBlobs):
+                    tmp.setMany(app)
+                    currentNumberOfBlobs = numberOfBlos
 
 
             packed_msg_size = data[:payload_size]
@@ -113,15 +123,26 @@ def server():
         'databaseURL': "https://ruypa-64600-default-rtdb.asia-southeast1.firebasedatabase.app/",
         'storageBucket': "ruypa-64600.appspot.com"
     })
+    currentNumberOfBlobs = checkNumberOfBlob(app)
     tmp.setMany(app)
     print('124')
     while True:
         client_socket, addr = server_socket.accept()
         print('GOT CONNECTION FROM:', addr)
 
-        receive_from_client(client_socket)
+        receive_from_client(client_socket, currentNumberOfBlobs, app, tmp)
 
     server_socket.close()
+
+def checkNumberOfBlob(app):
+    bucket = storage.bucket(app=app)
+    folder_path = 'Images'
+    blobs = bucket.list_blobs(prefix=folder_path)
+    dem = 0
+    for blob in blobs:
+        dem += 1
+    return dem
+
 
 server()
 
