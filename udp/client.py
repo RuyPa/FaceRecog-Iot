@@ -1,56 +1,21 @@
-# import cv2
-# import pickle
-# import socket
-# import struct
-#
-# client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# host_ip = '192.168.137.1'  # Địa chỉ IP của server
-# port = 806
-#
-# try:
-#     client_socket.connect((host_ip, port))
-#     vid = cv2.VideoCapture(0)  # Mở webcam
-#
-#     while True:
-#         ret, frame = vid.read()
-#         a = pickle.dumps(frame)
-#         message = struct.pack("Q", len(a)) + a
-#         client_socket.sendall(message)
-#
-#
-#         cv2.imshow('TRANSMITTING VIDEO', frame)
-#         key = cv2.waitKey(1) & 0xFF
-#         if key == ord('q'):
-#             break
-#
-#
-#
-# except KeyboardInterrupt:
-#     pass
-#
-# finally:
-#     client_socket.close()
-#     cv2.destroyAllWindows()
-
-
 import cv2
 import pickle
 import socket
 import struct
 from picamera2 import Picamera2
-import RPi.GPIO as GPIO
+from gpiozero import AngularServo
 import time
 
-led1 = 21
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(led1, GPIO.OUT)
+# servo = AngularServo(18, min_pulse_width = 0.0005, max_pulse_width = 0.0025)
+# servo.angle = 0
+
 picam2 = Picamera2()
 cv2.startWindowThread()
 picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', 'size': (640, 480)}))
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host_ip = '192.168.71.185'
-port = 806
+host_ip = '192.168.117.143'
+port = 807
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 try:
@@ -95,9 +60,15 @@ try:
             name = pickle.loads(name_data)
             print(name)
             if name == '1':
-                GPIO.output(led1, True)
-                time.sleep(10)
-                GPIO.output(led1, False)
+                servo = AngularServo(18, min_pulse_width=0.0005, max_pulse_width=0.0025)
+                servo.angle = 90
+                time.sleep(2)
+                servo.close()
+                time.sleep(5)
+                servo = AngularServo(18, min_pulse_width=0.0005, max_pulse_width=0.0025)
+                servo.angle = 0
+                time.sleep(2)
+                servo.close()
 
         # Display the frame with face detection
 
